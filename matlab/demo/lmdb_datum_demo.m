@@ -34,7 +34,11 @@ database = lmdb.DB(db_path, 'RDONLY', true, 'NOLOCK', true);
 % create caffe net instance
 caffe.set_mode_cpu();
 net = caffe.Net(net_model, net_weights, phase);
-
+% reshape the last dimension so we can run image by image. 
+model_shape = net.blobs('data').shape;
+model_shape(4) = 1;
+net.blobs('data').reshape(model_shape); % reshape blob 'data'
+net.reshape();
 
 
 max_count = 10; % maximum test cases
