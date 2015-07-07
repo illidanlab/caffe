@@ -29,6 +29,11 @@ cursor = database.cursor('RDONLY', true);
 if nargin<3, max_count = -1; end % maximum test cases
 if nargin<4, verbose   = 1;  end
 
+% reshape the last dimension so we can run image by image. 
+model_shape = net.blobs('data').shape;
+model_shape(4) = 1;
+net.blobs('data').reshape(model_shape); % reshape blob 'data'
+net.reshape();
 
 count = 0;       % number of samples processed. 
 correctNum = 0;  % number of samples correctly predicted. 
