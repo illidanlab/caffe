@@ -32,7 +32,7 @@ caffe.set_mode_cpu();
 net = caffe.Net(net_model, net_weights, phase);
 
 % the evaluation functional. 
-test_func = @(network) mnist_test_lmdb( database, net, 100, 0);
+test_func = @(network) mnist_test_lmdb( database, network, 500, 0);
 
 % test the original network 
 acc0 = test_func( net);
@@ -42,7 +42,7 @@ fprintf('The orignal network has the accuracy of %.4f\n', acc0);
 ip1_mat     = net.params('ip1',1).get_data;
 [U, S, V]   = svd(ip1_mat, 0);
 S_diag_sqr  = diag(S).^2;
-approx_rank = 200; % the rank used for approximation
+approx_rank = 20; % the rank used for approximation
 info_loss = sum(S_diag_sqr(approx_rank+1:end))/sum(S_diag_sqr);
 fprintf('A rank %d approximation on layer ip1 leads to approximation error %.4f\n', ...
     approx_rank, info_loss);
