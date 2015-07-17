@@ -1,4 +1,4 @@
-function [ accuracy ] = mnist_test_lmdb( database, net, max_count, verbose)
+function [ accuracy, forward_time ] = mnist_test_lmdb( database, net, max_count, verbose)
 %MNIST_TEST_LMDB test MNIST images from image net. 
 %
 % INPUTS
@@ -35,6 +35,7 @@ model_shape(4) = 1;
 net.blobs('data').reshape(model_shape); % reshape blob 'data'
 net.reshape();
 
+forward_time = 0;
 count = 0;       % number of samples processed. 
 correctNum = 0;  % number of samples correctly predicted. 
 while cursor.next()
@@ -50,7 +51,10 @@ while cursor.next()
     data = permute(data, [2,1,3]);
   
     % generate prediction 
+    tic;
     scores = net.forward({data});
+    forward_time = forward_time + toc;
+    
     predict_class = find(scores{1}==1) - 1; % shift 1
     
     if verbose >= 2
