@@ -131,23 +131,32 @@ end
 % net = caffe.Net(net_ip1rk20_model, net_ip1rk20_init_weight, phase_test);
 
 %%%
-net_ip1rk20_solver      = strcat(cur_director, '/lenet_ip1rk20_solver.prototxt');
+net_solver              = strcat(cur_director, '/lenet_solver.prototxt');
+net_ip1rk20_solver      = strcat(cur_director, '/lenet_ip1rk20_solver_gen.prototxt');
 net_ip1rk20_model       = strcat(cur_director, '/lenet_ip1rk20_gen.prototxt');
 net_train_test          = strcat(cur_director, '/lenet_train_test.prototxt');
 net_ip1rk20_train_test  = strcat(cur_director, '/lenet_ip1rk20_train_test_gen.prototxt');
 net_ip1rk20_init_weight = strcat(cur_director, '/lenet_ip1rk20_init.caffemodel');
 
+disp('Transforming solver configureation...')
+state = system([python_bin, ' netsurg_solvercfg.py ',net_solver, ...
+            ' net=', net_ip1rk20_train_test , ...
+            ' 2>/dev/null 1> ', net_ip1rk20_solver]);
+if state~= 0, error('failed'); end
+        
 disp('Transforming model structure file...')
-system([python_bin, ' netsurg_fclw.py ',source_layer_name, ...
+state = system([python_bin, ' netsurg_fclw.py ',source_layer_name, ...
             ' ', target_layer_names{1}, ' ' ,target_layer_names{2}, ...
             ' ', int2str(approx_rank),  ' ', net_model, ...
             ' 2>/dev/null 1> ', net_ip1rk20_model]);
-
+if state~= 0, error('failed'); end
+        
 disp('Transforming model train/test file...')
-system([python_bin, ' netsurg_fclw.py ',source_layer_name, ...
+state = system([python_bin, ' netsurg_fclw.py ',source_layer_name, ...
             ' ', target_layer_names{1}, ' ' ,target_layer_names{2}, ...
             ' ', int2str(approx_rank),  ' ', net_train_test, ...
             ' 2>/dev/null 1> ', net_ip1rk20_train_test]);
+if state~= 0, error('failed'); end
 
 disp('Initializing solver using new structure...')
 solver = caffe.Solver(net_ip1rk20_solver);
