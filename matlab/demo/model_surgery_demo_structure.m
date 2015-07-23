@@ -16,6 +16,7 @@ end
 
 python_bin = '/usr/local/bin/python';
 setenv('DYLD_LIBRARY_PATH', '/usr/local/bin/'); % python lib path.
+%setenv('LD_LIBRARY_PATH', '/usr/lib64;/usr/local/cuda-7.0/lib64;/usr/local/cudnn/'); %(Cuda Ubuntu)
 
 addpath ../../../matlab-lmdb/  % change to your matlab-lmdb path
 cur_director = pwd;
@@ -143,14 +144,14 @@ state = system([python_bin, ' netsurg_solvercfg.py ',net_solver, ...
             ' net=', net_ip1rk20_train_test , ...
             ' 2>/dev/null 1> ', net_ip1rk20_solver]);
 if state~= 0, error('failed'); end
-        
+
 disp('Transforming model structure file...')
 state = system([python_bin, ' netsurg_fclw.py ',source_layer_name, ...
             ' ', target_layer_names{1}, ' ' ,target_layer_names{2}, ...
             ' ', int2str(approx_rank),  ' ', net_model, ...
             ' 2>/dev/null 1> ', net_ip1rk20_model]);
 if state~= 0, error('failed'); end
-        
+
 disp('Transforming model train/test file...')
 state = system([python_bin, ' netsurg_fclw.py ',source_layer_name, ...
             ' ', target_layer_names{1}, ' ' ,target_layer_names{2}, ...
